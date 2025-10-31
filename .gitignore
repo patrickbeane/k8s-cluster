@@ -1,0 +1,10 @@
+# Ignore raw secrets
+**/*-secret.yaml
+**/*-secrets.yaml
+
+# Allow encrypted SealedSecrets
+!**/*-sealedsecret.yaml
+
+# Editor + system clutter
+*.swp
+.DS_Store

@@ -1,0 +1,76 @@
+# Default deny
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: borgmatic
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Allow egress to Postgres (5432) for pg_dump
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-postgres
+  namespace: borgmatic
+spec:
+  podSelector:
+    matchLabels:
+      app: borgmatic
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+  policyTypes:
+    - Egress
+---
+# Allow egress to rsync.net (borg repo) over SSH (22)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-rsync
+  namespace: borgmatic
+spec:
+  podSelector:
+    matchLabels:
+      app: borgmatic
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 22
+  policyTypes:
+    - Egress
+---
+# Allow DNS lookups (port 53)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: borgmatic
+spec:
+  podSelector: {}
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+  policyTypes:
+    - Egress

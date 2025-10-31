@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: borgmatic-pgdump
+  namespace: borgmatic
+spec:
+  schedule: "0 */2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: pgdump
+              image: postgres:17
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: gitea-postgresql
+                      key: password
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  pg_dump -h postgresql.default.svc.cluster.local \
+                          -U gitea gitea > /backups/pgdump.sql
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+
+            - name: borgmatic
+              image: ghcr.io/borgmatic-collective/borgmatic:latest
+              envFrom:
+                - secretRef:
+                    name: borgmatic-secrets
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  export BORG_RSH="ssh -i /etc/borgmatic/keys/borgmatic_rsync"
+                  borgmatic --verbosity 1
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+                - name: borg-key
+                  mountPath: /etc/borgmatic/keys
+                  readOnly: true
+
+          restartPolicy: OnFailure
+          volumes:
+            - name: backups
+              emptyDir: {}
+            - name: borg-key
+              secret:
+                secretName: borgmatic-secrets
+                items:
+                  - key: BORG_KEY
+                    path: borgmatic_rsync
