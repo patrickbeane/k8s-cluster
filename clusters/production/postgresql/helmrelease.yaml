@@ -6,12 +6,13 @@ metadata:
 spec:
   interval: 10m
   chart:
-    chart: postgresql
-    version: 16.7.27
-    sourceRef:
-      kind: HelmRepository
-      name: bitnami
-      namespace: postgresql
+    spec:
+      chart: postgresql
+      version: 16.7.27
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: postgresql
   values:
     image:
       tag: 17.6.0

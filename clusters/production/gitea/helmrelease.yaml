@@ -7,12 +7,13 @@ spec:
   releaseName: gitea
   interval: 10m
   chart:
-    chart: gitea
-    version: 10.3.0
-    sourceRef:
-      kind: HelmRepository
-      name: gitea-charts
-      namespace: gitea
+    spec:
+      chart: gitea
+      version: 10.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: gitea-charts
+        namespace: gitea
   values:
     ingress:
       enabled: true
