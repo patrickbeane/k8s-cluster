@@ -10,8 +10,8 @@ spec:
       chart: postgresql
       version: 16.7.27
       sourceRef:
-        kind: HelmRepository
-        name: bitnami-postgresql
+        kind: HelmChart
+        name: postgresql-direct
         namespace: flux-system
   values:
     image:

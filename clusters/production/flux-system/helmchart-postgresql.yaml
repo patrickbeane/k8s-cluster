@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmChart
+metadata:
+  name: postgresql-direct
+  namespace: flux-system
+spec:
+  chart: https://charts.bitnami.com/bitnami/postgresql-16.7.27.tgz
+  interval: 1h
