@@ -20,26 +20,35 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: cert-manager
+  policyTypes:
+    - Egress
   egress:
-    # Let's Encrypt traffic
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
       ports:
         - protocol: TCP
           port: 443
-    # Allow traffic to the cluster’s own API (internal)
+---
+# Allow egress to Kubernetes API server
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-apiserver
+  namespace: cert-manager
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
     - to:
         - ipBlock:
-            cidr: 10.1.0.0/16
+            cidr: 10.152.183.1/32   # API server ClusterIP
       ports:
         - protocol: TCP
           port: 443
-
-  policyTypes:
-    - Egress
 ---
-# Allow DNS lookups (port 53)
+# Allow DNS lookups via kube-dns service
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -47,18 +56,14 @@ metadata:
   namespace: cert-manager
 spec:
   podSelector: {}
+  policyTypes:
+    - Egress
   egress:
     - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.152.183.10/32   # kube-dns ClusterIP
       ports:
         - protocol: UDP
           port: 53
         - protocol: TCP
           port: 53
-  policyTypes:
-    - Egress
