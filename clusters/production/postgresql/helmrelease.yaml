@@ -4,14 +4,13 @@ metadata:
   name: gitea-postgresql
   namespace: postgresql
 spec:
-  interval: 10m
   chart:
     spec:
       chart: postgresql
       version: 16.7.27
       sourceRef:
-        kind: HelmChart
-        name: postgresql-direct
+        kind: HelmRepository
+        name: bitnami
         namespace: flux-system
   values:
     image:
