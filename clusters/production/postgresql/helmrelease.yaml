@@ -11,7 +11,7 @@ spec:
       version: 16.7.27
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: bitnami-postgresql
         namespace: flux-system
   values:
     image:
