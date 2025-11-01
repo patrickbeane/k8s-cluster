@@ -13,8 +13,6 @@ spec:
         name: flux-system
         namespace: flux-system
   values:
-    image:
-      tag: 17.6.0
     auth:
       existingSecret: gitea-postgresql
     primary:
