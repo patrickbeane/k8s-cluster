@@ -6,3 +6,4 @@ metadata:
 spec:
   url: https://charts.bitnami.com/bitnami
   interval: 1h
+  type: default
